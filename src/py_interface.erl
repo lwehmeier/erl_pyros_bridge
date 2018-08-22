@@ -47,6 +47,8 @@ publish(MsgFormat, Topic, Data) ->
   after 5500 ->
     exit({pyBridge_timeout, publish, Topic})
   end.
+publish_ff(MsgFormat, Topic, Data) ->
+	{?PYPROCESS,?PYNODE} ! {self(), publish, MsgFormat, Topic, Data}.
 call_grisp_handler({Module, Function}, Data) ->
   rpc:call(?GRISPNODE, Module, Function, Data).
 % case erlang:function_exported(Module, Function, 1) of
@@ -126,16 +128,16 @@ publishLoop()->
     %{AX, AY, AZ} = call_grisp_handler({gen_server, call},[pmod_nav2, getAcc]),
     {GX, GY, GZ} = call_grisp_handler({gen_server, call},[pmod_nav2, getGy]),
     %publish(int16, "/distance", Distance),
-    publish(float32, "/batteries/drive/current", Current1),
-    publish(float32, "/batteries/electronics/current", Current2),
-    publish(float32, "/batteries/drive/voltage", Voltage1),
-    publish(float32, "/batteries/electronics/voltage", Voltage2),
+    publish_ff(float32, "/batteries/drive/current", Current1),
+    publish_ff(float32, "/batteries/electronics/current", Current2),
+    publish_ff(float32, "/batteries/drive/voltage", Voltage1),
+    publish_ff(float32, "/batteries/electronics/voltage", Voltage2),
     %publish(float32, "/acceleration/x", AX),
     %publish(float32, "/acceleration/y", AY),
     %publish(float32, "/acceleration/z", AZ),
-    publish(float32, "/gyro/x", GX),
-    publish(float32, "/gyro/y", GY),
-    publish(float32, "/gyro/z", GZ),
+    publish_ff(float32, "/gyro/x", GX),
+    publish_ff(float32, "/gyro/y", GY),
+    publish_ff(float32, "/gyro/z", GZ),
     publishLoop()
   end.
 
